@@ -1,0 +1,52 @@
+spring:
+  application:
+    name: orders-modular-monolith
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:monolith_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL}
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:org.h2.Driver}
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+server:
+  port: ${SERVER_PORT:8080}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    distribution:
+      percentiles-histogram:
+        orders.creation.latency: true
+      sla:
+        orders.creation.latency: 800ms, 1300ms
+
+payments:
+  provider:
+    url: ${PAYMENTS_PROVIDER_URL:https://api.payment-provider.example.com}
+    mock: ${PAYMENTS_PROVIDER_MOCK:true}
+
+notifications:
+  worker:
+    delay-ms: 30000
+
+logging:
+  level:
+    root: INFO
+    com.monolith: DEBUG

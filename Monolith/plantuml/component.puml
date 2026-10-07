@@ -1,0 +1,86 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+title Core API - Components
+
+Container_Boundary(orders, "Orders") {
+
+    Container_Boundary(orderApi, "*.api") {
+        Component(orderService, "OrderService", "", "Orders business logic API")
+    }
+
+    Container_Boundary(orderInternal, "*.infra.*") {
+        Component(orderServiceImpl, "OrderServiceImpl", "", "Orders business logic")
+        Component(orderController, "OrderController", "Controller", "HTTP endpoints")
+        Component(orderRepo, "OrderRepository", "Repository", "Data access")
+    }
+}
+
+Container_Boundary(payments, "Payments") {
+    Container_Boundary(paymentsApi, "*.api") {
+        Component(paymentService, "PaymentService", "Service", "Payments business logic API")
+    }
+
+    Container_Boundary(paymentsInternal, "*.infra.*") {
+        Component(paymentServiceImpl, "PaymentServiceImpl", "Service", "Payments business logic")
+        Component(paymentClient, "PaymentClient", "HTTP Client", "Integration with payment provider")
+        Component(paymentRepo, "PaymentRepository", "Repository", "Data access")
+    }
+
+}
+
+Container_Boundary(users, "Users") {
+    Container_Boundary(userApi, "*.api") {
+        Component(userService, "UserService", "Service", "Users business logic API")
+    }
+
+    Container_Boundary(userInternal, "*.infra.*") {
+        Component(userServiceImpl, "UserServiceImpl", "Service", "Users business logic")
+        Component(userController, "UserController", "Spring MVC/WebFlux Controller", "HTTP endpoints")
+        Component(userRepo, "UserRepository", "Repository", "Data access")
+    }
+
+}
+
+Container_Boundary(notifications, "Notifications") {
+
+    Container_Boundary(notificationApi, "*.api") {
+        Component(notificationService, "NotificationService", "Service", "Notifications business logic API")
+    }
+
+    Container_Boundary(notificationInternal, "*.infra.*") {
+        Component(notificationServiceImpl, "NotificationServiceImpl", "Service", "Notifications business logic")
+        Component(notificationRepo, "NotificationRepository", "Repository", "Data access")
+        Component(notificationWorker, "NotificationWorker", "Worker", "Worker for sending notifications")
+    }
+
+}
+
+ComponentDb(db, "PostgreSQL", "DB", "orders/payments")
+
+Rel(orderController, orderService, "calls")
+Rel(orderService, orderRepo, "calls")
+Rel(orderRepo, db, "reads/writes")
+
+Rel(paymentService, paymentRepo, "calls")
+Rel(paymentRepo, db, "reads/writes")
+
+Rel(userController, userService, "calls")
+Rel(userService, userRepo, "calls")
+Rel(userRepo, db, "reads/writes")
+
+Rel(notificationService, notificationRepo, "calls")
+Rel(notificationRepo, db, "reads/writes")
+Rel(notificationWorker, notificationService, "calls")
+
+Rel(orderService, paymentService, "calls")
+Rel(orderService, userService, "calls")
+Rel(orderService, notificationService, "calls")
+
+Rel(orderServiceImpl, orderService, "implements")
+Rel(paymentServiceImpl, paymentService, "implements")
+Rel(userServiceImpl, userService, "implements")
+Rel(notificationServiceImpl, notificationService, "implements")
+
+
+@enduml
