@@ -73,6 +73,19 @@ src/main/java/com/monolith/
 
 ---
 
+## Architecture Verification (ArchUnit)
+
+Automated architectural fitness functions are implemented in `ModularityArchTest`:
+- **API-Only Cross-Module Access**: Dependencies between modules are restricted exclusively to `*.api.*` packages. Accessing another module's `*.infra.*` (via imports, fields, method signatures, or calls) fails the test build.
+- **Cycle-Free Modules**: Verifies that modules (`orders`, `payments`, `users`, `notifications`) have no circular dependency loops.
+
+Run architecture tests:
+```bash
+./gradlew test --tests com.monolith.modularity.ModularityArchTest
+```
+
+---
+
 ## Build and Run Instructions
 
 ### Prerequisites
